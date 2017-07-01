@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import RomanCrowdsale from '../build/contracts/RomanCrowdsale.json'
+import MintableToken from '../build/contracts/MintableToken.json'
 import getWeb3 from './utils/getWeb3'
 
 import './css/oswald.css'
@@ -10,10 +11,14 @@ import './App.css'
 class App extends Component {
   constructor(props) {
     super(props)
-
+    this.onClickBuy = this.onClickBuy.bind(this)
+    this.crowdsaleAddress = '0x6b070d930bB22990c83fBBfcba6faB129AD7E385'
     this.state = {
-      storageValue: 0,
-      web3: null
+      web3: null,
+      netId: null,
+      defaultAccount: null,
+      tokenAddress: 0x0,
+      disabledBtn: false,
     }
   }
 
@@ -22,17 +27,17 @@ class App extends Component {
     // See utils/getWeb3 for more info.
 
     getWeb3
-    .then(results => {
-      this.setState({
-        web3: results.web3
-      })
+      .then(results => {
+        this.setState({
+          web3: results.web3,
+        })
 
-      // Instantiate contract once web3 provided.
-      this.instantiateContract()
-    })
-    .catch(() => {
-      console.log('Error finding web3.')
-    })
+        // Instantiate contract once web3 provided.
+        this.instantiateContract()
+      })
+      .catch(() => {
+        console.log('Error finding web3.')
+      })
   }
 
   instantiateContract() {
@@ -44,47 +49,142 @@ class App extends Component {
      */
 
     const contract = require('truffle-contract')
-    const simpleStorage = contract(SimpleStorageContract)
-    simpleStorage.setProvider(this.state.web3.currentProvider)
+    const romanCrowdsale = contract(RomanCrowdsale)
+    const mintableToken = contract(MintableToken)
+    romanCrowdsale.setProvider(this.state.web3.currentProvider)
+    mintableToken.setProvider(this.state.web3.currentProvider)
 
-    // Declaring this for later so we can chain functions on SimpleStorage.
-    var simpleStorageInstance
+    // Declaring this for later so we can chain functions on romanCrowdsale.
+    var romanCrowdsaleInstance, tokenInstance
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      simpleStorage.deployed().then((instance) => {
-        simpleStorageInstance = instance
-
+      let token, totalSupply;
+      romanCrowdsale.at(this.crowdsaleAddress).then((instance) => {
+        this.romanCrowdsaleInstance = instance
+        romanCrowdsaleInstance = instance
+        console.log('cr', romanCrowdsaleInstance)
         // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, {from: accounts[0]})
-      }).then((result) => {
+        return romanCrowdsaleInstance.token()
+      }).then((_token) => {
+        token = _token;
         // Get the value from the contract to prove it worked.
-        return simpleStorageInstance.get.call(accounts[0])
-      }).then((result) => {
-        // Update state with the result.
-        return this.setState({ storageValue: result.c[0] })
+        tokenInstance = mintableToken.at(token);
+        this.tokenInstance = tokenInstance
+        console.log('tt', tokenInstance)
+        return tokenInstance.totalSupply.call()
+      }).then((totalSupply) => {
+        totalSupply = this.state.web3.fromWei(totalSupply.toNumber(), 'ether')
+        this.updateBalance(accounts[0]);
+        this.setState({
+          defaultAccount: accounts[0] || "Please Unlock Metamask",
+          tokenAddress: token,
+          crowdsaleAddress: romanCrowdsaleInstance.address,
+          totalSupply: totalSupply
+        })
+      }).catch((e) => {
+        console.error(e);
       })
+    })
+
+  }
+  updateBalance(account) {
+    return this.tokenInstance.balanceOf.call(account).then((balance) => {
+      balance = this.state.web3.fromWei(balance.toNumber(), 'ether')
+      this.setState({ tokenBalance: balance })
     })
   }
 
+  checkTransaction(txId) {
+    this.state.web3.eth.getTransaction(txId, (error, res) => {
+      if (res.blockHash) {
+        console.log('mined!', res.blockNumber)
+        this.updateBalance(this.state.defaultAccount);
+        this.setState({ txStatus: `Mined at ${res.blockNumber}`, disabledBtn: false })
+      } else {
+        console.log('Not mined yet')
+        this.checkTransaction(txId)
+      }
+    })
+  }
+
+  onClickBuy() {
+    let amount = Number(this.refs.amount.value);
+    if (!isNaN(amount)) {
+      this.setState({ disabledBtn: true })
+      amount = this.state.web3.toWei(amount, 'ether');
+      this.romanCrowdsaleInstance.buyTokens(this.state.defaultAccount, { value: amount, from: this.state.defaultAccount }).then((result) => {
+        console.log(result);
+        this.setState({ txId: result.tx, txStatus: 'pending' });
+        setTimeout(this.checkTransaction.bind(this, result.tx), 5);
+      })
+    }
+  }
+
   render() {
+    const currentAccount = `https://kovan.etherscan.io/address/${this.state.defaultAccount}`
+    const tokenAddress = `https://kovan.etherscan.io/address/${this.state.tokenAddress}`
+    const crowdsaleAddress = `https://kovan.etherscan.io/address/${this.state.crowdsaleAddress}`
+    const disabledBtn = this.state.disabledBtn;
+    let txId, txStatus;
+    if (this.state.txId) {
+      txId = (<tr>
+        <td>TransactionID</td>
+        <td>{this.state.txId}</td>
+      </tr>)
+      txStatus = (<tr>
+        <td>Transaction Status </td>
+        <td>{this.state.txStatus}</td>
+      </tr>)
+    }
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
         </nav>
-
         <main className="container">
-          <div className="pure-g">
-            <div className="pure-u-1-1">
-              <h1>Good to Go!</h1>
-              <p>Your Truffle Box is installed and ready.</p>
-              <h2>Smart Contract Example</h2>
-              <p>If your contracts compiled and migrated successfully, below will show a stored value of 5 (by default).</p>
-              <p>Try changing the value stored on <strong>line 59</strong> of App.js.</p>
-              <p>The stored value is: {this.state.storageValue}</p>
-            </div>
+          <div class="pure-u-1 pure-u-md-3-4">
+            <table className="pure-table pure-table-bordered">
+              <tbody>
+                <tr>
+                  <td>Current Account</td>
+                  <td>
+                    <a href={currentAccount} target="_blank">{this.state.defaultAccount}</a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>Token Address</td>
+                  <td><a href={tokenAddress} target="_blank">{this.state.tokenAddress}</a></td>
+                </tr>
+
+                <tr>
+                  <td>Crowdsale Contract Address</td>
+                  <td><a href={crowdsaleAddress} target="_blank">{this.state.crowdsaleAddress}</a></td>
+                </tr>
+
+                <tr>
+                  <td>Total Supply</td>
+                  <td>{this.state.totalSupply} RST</td>
+                </tr>
+                <tr>
+                  <td>Balance</td>
+                  <td> {this.state.tokenBalance} RST</td>
+                </tr>
+                {txId}
+                {txStatus}
+              </tbody>
+            </table>
           </div>
+
+          <div class="pure-u-md-2">
+            <form className="pure-form">
+              <input ref="amount" type="number" step="0.00000001" placeholder="Please enter amount in ether" /><span>Ether</span>
+              <button className="pure-button pure-button-primary" disabled={disabledBtn} onClick={this.onClickBuy}>Buy Tokens</button>
+
+            </form>
+          </div>
+
         </main>
       </div>
     );
