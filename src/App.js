@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
+
 import RomanCrowdsale from '../build/contracts/RomanCrowdsale.json'
 import MintableToken from '../build/contracts/MintableToken.json'
 import getWeb3 from './utils/getWeb3'
-
+import Loading from './Loading'
 import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
@@ -122,6 +123,12 @@ class App extends Component {
   }
 
   render() {
+    const loading = !this.state.web3;
+    if (loading) {
+      return (
+        <Loading />
+      )
+    }
     const currentAccount = `https://kovan.etherscan.io/address/${this.state.defaultAccount}`
     const tokenAddress = `https://kovan.etherscan.io/address/${this.state.tokenAddress}`
     const crowdsaleAddress = `https://kovan.etherscan.io/address/${this.state.crowdsaleAddress}`
@@ -140,10 +147,15 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-          <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link">Github</a>
+
         </nav>
-        <main className="container">
-          <div class="pure-u-1 pure-u-md-3-4">
+        <main className="container pure-g">
+          <div className="pure-u-1-5 pure-u-md-1-4"></div>
+          <div className="pure-u-3-5 pure-u-md-2-4">
+            <p>
+              Please point Metamask to Kovan chain
+            </p>
             <table className="pure-table pure-table-bordered">
               <tbody>
                 <tr>
@@ -176,12 +188,19 @@ class App extends Component {
               </tbody>
             </table>
           </div>
-
-          <div class="pure-u-md-2">
-            <form className="pure-form">
-              <input ref="amount" type="number" step="0.00000001" placeholder="Please enter amount in ether" /><span>Ether</span>
-              <button className="pure-button pure-button-primary" disabled={disabledBtn} onClick={this.onClickBuy}>Buy Tokens</button>
-
+          <div className="pure-u-1-5 pure-u-md-1-4"></div>
+          <div className="pure-u-1-5 pure-u-md-1-4"></div>
+          <div className="pure-u-4-5">
+            <form className="pure-form pure-form-aligned" style={{ padding: '10px 0' }}>
+              <div className="pure-g">
+                <div className="pure-u-5-5 pure-u-md-1-3">
+                  <label htmlFor="foo">Amount in Kether: </label>
+                  <input className="pure-input-1-3" ref="amount" type="number" step="0.00001" placeholder="Please enter amount in Kether" />
+                </div>
+                <div className="pure-u-1 pure-u-md-1-3">
+                  <button className="pure-button pure-button-primary pure-input-1-5" disabled={disabledBtn} onClick={this.onClickBuy}>Buy Tokens</button>
+                </div>
+              </div>
             </form>
           </div>
 
