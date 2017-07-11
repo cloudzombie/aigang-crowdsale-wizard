@@ -156,7 +156,7 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal" style={{ justifyContent: 'space-between' }}>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link" ></a>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
           <h1>Presale Investment</h1>
           <div style={{ alignSelf: 'center' }}>
             <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
