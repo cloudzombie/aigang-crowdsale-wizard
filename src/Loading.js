@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Line, Circle } from 'rc-progress';
+import {PulseLoader} from 'halogen';
+const Loader = PulseLoader;
 
 export default class Loading extends Component {
     constructor(props) {
@@ -28,11 +29,10 @@ export default class Loading extends Component {
 
     render() {
         return (
-            <div className="pure-g" style={{ justifyContent: 'center' }}>
-
-                <div className="pure-u-1-3" style={{ textAlign: 'center' }}>
+            <div className="pure-g" style={{alignItems: 'center', height: '100%'}}>
+                <div className="pure-u-1" style={{ textAlign: 'center'}}>
                     Loading web3 ...
-                <Circle strokeWidth="6" percent={this.state.percent} />
+                 <Loader color="#7c24ad" size="50px" margin="4px"/>
                 </div>
             </div>
         )

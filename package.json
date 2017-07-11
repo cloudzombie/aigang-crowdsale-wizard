@@ -54,7 +54,7 @@
     "dotenv": "^2.0.0",
     "ethereumjs-wallet": "^0.6.0",
     "gh-pages": "^1.0.0",
-    "rc-progress": "^2.2.1",
+    "halogen": "^0.2.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "sweetalert": "^1.1.3",
