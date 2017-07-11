@@ -7419,8 +7419,8 @@ yargs@~3.10.0:
     decamelize "^1.0.0"
     window-size "0.1.0"
 
-"zeppelin-solidity@git://github.com/OpenZeppelin/zeppelin-solidity.git#crowdsale":
-  version "1.0.7"
-  resolved "git://github.com/OpenZeppelin/zeppelin-solidity.git#de92a0212714b66bb56b05318412ac8a92d5cf90"
+zeppelin-solidity@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/zeppelin-solidity/-/zeppelin-solidity-1.1.0.tgz#89fc596610dc273698e5580457eeb84add2213d7"
   dependencies:
     truffle-hdwallet-provider "0.0.3"

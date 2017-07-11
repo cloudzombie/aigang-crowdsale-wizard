@@ -61,7 +61,7 @@
     "truffle": "^3.3.0",
     "web3": "^0.19.1",
     "web3-provider-engine": "^13.0.3",
-    "zeppelin-solidity": "git://github.com/OpenZeppelin/zeppelin-solidity.git#crowdsale"
+    "zeppelin-solidity": "^1.1.0"
   },
   "scripts": {
     "start": "node scripts/start.js",
