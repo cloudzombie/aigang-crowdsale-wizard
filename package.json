@@ -53,6 +53,7 @@
     "bip39": "^2.3.1",
     "dotenv": "^2.0.0",
     "ethereumjs-wallet": "^0.6.0",
+    "font-awesome": "^4.7.0",
     "gh-pages": "^1.0.0",
     "halogen": "^0.2.0",
     "react": "^15.4.2",

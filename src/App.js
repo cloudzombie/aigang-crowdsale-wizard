@@ -146,9 +146,15 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal">
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link">Github</a>
-
+        <nav className="navbar pure-menu pure-menu-horizontal" style={{justifyContent: 'space-between'}}>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
+          <h3>Presale Investment</h3>
+          <div style={{alignSelf: 'center'}}>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-lg"></a>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-lg"></a>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-lg"></a>
+          </div>
         </nav>
         <main className="container pure-g">
           <div className="pure-u-1-5 pure-u-md-1-4"></div>
