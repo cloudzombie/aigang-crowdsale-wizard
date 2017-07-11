@@ -20,8 +20,8 @@ class App extends Component {
     }
   }
 
-  componentWillUpdate(nextProps, nextState){
-    if(this.refs.copyCrowdsaleAddr){
+  componentWillUpdate(nextProps, nextState) {
+    if (this.refs.copyCrowdsaleAddr) {
       const Clipboard = require('clipboard');
       this.clipboard = new Clipboard(this.refs.copyCrowdsaleAddr);
     }
@@ -125,9 +125,9 @@ class App extends Component {
       })
     }
   }
-  onCopyClick(){
+  onCopyClick() {
     this.refs.tooltip.classList.toggle('show')
-    setTimeout(()=> {
+    setTimeout(() => {
       this.refs.tooltip.classList.toggle('show')
     }, 2000);
   }
@@ -155,27 +155,27 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal" style={{justifyContent: 'space-between'}}>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
+        <nav className="navbar pure-menu pure-menu-horizontal" style={{ justifyContent: 'space-between' }}>
+          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link" ></a>
           <h1>Presale Investment</h1>
-          <div style={{alignSelf: 'center'}}>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-lg"></a>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-lg"></a>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-lg"></a>
+          <div style={{ alignSelf: 'center' }}>
+            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
+            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-lg"></a>
+            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-lg"></a>
+            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-lg"></a>
           </div>
         </nav>
         <main className="container pure-g">
           <div className="pure-u-4-5 pure-u-md-3-4">
-            <h1 style={{color: '#7c24ad'}}>
+            <h1 style={{ color: '#7c24ad' }}>
               Let's build it together!
             </h1>
-            <p>
+            <p className="lightGrey">
               Invest directly from your metamask account by selecting the amount and clicking invest, or copy
               the address and send Ethers from any other wallet.
               </p>
-              </div>
-              <div className="pure-u-16-24 pure-u-md-2-4">
+          </div>
+          <div className="pure-u-16-24 pure-u-md-2-4">
             <table className="pure-table pure-table-horizontal">
               <tbody>
                 <tr>
@@ -222,13 +222,13 @@ class App extends Component {
           </div>
           <div className="pure-u-1-5 pure-u-md-1-4">
             <form className="pure-form pure-form-aligned">
-                <div style={{marginBottom: '15px'}}>Choose amount to invest</div>
-                  <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
-                  <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
+              <div style={{ marginBottom: '15px' }}>Choose amount to invest</div>
+              <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
+              <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
             </form>
             <h2>Requirements</h2>
-            <div style={{margin: "10px 0px"}}>Recommended gas limit 200,000</div>
-            <div>Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
+            <div style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
+            <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
           </div>
 
         </main>

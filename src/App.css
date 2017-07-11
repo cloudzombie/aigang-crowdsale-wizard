@@ -7,6 +7,9 @@ body,
 h1, h2, h3 {
   font-family: 'Ubuntu', sans-serif;
 }
+.lightGrey {
+  color: #9c9c9c;
+}
 
 .pure-table {
   border: none;
