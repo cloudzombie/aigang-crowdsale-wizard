@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-
 import RomanCrowdsale from '../build/contracts/RomanCrowdsale.json'
 import MintableToken from '../build/contracts/MintableToken.json'
 import getWeb3 from './utils/getWeb3'
 import Loading from './Loading'
-import './css/oswald.css'
-import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 
@@ -20,6 +17,13 @@ class App extends Component {
       defaultAccount: null,
       tokenAddress: 0x0,
       disabledBtn: false,
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    if(this.refs.copyCrowdsaleAddr){
+      const Clipboard = require('clipboard');
+      this.clipboard = new Clipboard(this.refs.copyCrowdsaleAddr);
     }
   }
 
@@ -121,7 +125,12 @@ class App extends Component {
       })
     }
   }
-
+  onCopyClick(){
+    this.refs.tooltip.classList.toggle('show')
+    setTimeout(()=> {
+      this.refs.tooltip.classList.toggle('show')
+    }, 2000);
+  }
   render() {
     const loading = !this.state.web3;
     if (loading) {
@@ -148,7 +157,7 @@ class App extends Component {
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal" style={{justifyContent: 'space-between'}}>
           <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
-          <h3>Presale Investment</h3>
+          <h1>Presale Investment</h1>
           <div style={{alignSelf: 'center'}}>
           <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
           <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-lg"></a>
@@ -157,57 +166,69 @@ class App extends Component {
           </div>
         </nav>
         <main className="container pure-g">
-          <div className="pure-u-1-5 pure-u-md-1-4"></div>
-          <div className="pure-u-3-5 pure-u-md-2-4">
+          <div className="pure-u-4-5 pure-u-md-3-4">
+            <h1 style={{color: '#7c24ad'}}>
+              Let's build it together!
+            </h1>
             <p>
-              Please point Metamask to Kovan chain
-            </p>
-            <table className="pure-table pure-table-bordered">
+              Invest directly from your metamask account by selecting the amount and clicking invest, or copy
+              the address and send Ethers from any other wallet.
+              </p>
+              </div>
+              <div className="pure-u-16-24 pure-u-md-2-4">
+            <table className="pure-table pure-table-horizontal">
               <tbody>
                 <tr>
                   <td>Current Account</td>
                   <td>
                     <a href={currentAccount} target="_blank">{this.state.defaultAccount}</a>
                   </td>
+                  <td></td>
                 </tr>
 
                 <tr>
                   <td>Token Address</td>
                   <td><a href={tokenAddress} target="_blank">{this.state.tokenAddress}</a></td>
+                  <td>
+                    <div id="tooltip" ref="tooltip">copied</div>
+                  </td>
                 </tr>
 
                 <tr>
                   <td>Crowdsale Contract Address</td>
-                  <td><a href={crowdsaleAddress} target="_blank">{this.state.crowdsaleAddress}</a></td>
+                  <td><a href={crowdsaleAddress} target="_blank">{this.state.crowdsaleAddress}</a>
+                  </td>
+                  <td>
+                    <i onClick={this.onCopyClick.bind(this)} ref="copyCrowdsaleAddr" data-clipboard-text={this.state.crowdsaleAddress} className="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                  </td>
                 </tr>
 
                 <tr>
                   <td>Total Supply</td>
                   <td>{this.state.totalSupply} RST</td>
+                  <td></td>
                 </tr>
                 <tr>
                   <td>Balance</td>
                   <td> {this.state.tokenBalance} RST</td>
+                  <td></td>
                 </tr>
                 {txId}
                 {txStatus}
               </tbody>
             </table>
           </div>
-          <div className="pure-u-1-5 pure-u-md-1-4"></div>
-          <div className="pure-u-1-5 pure-u-md-1-4"></div>
-          <div className="pure-u-4-5">
-            <form className="pure-form pure-form-aligned" style={{ padding: '10px 0' }}>
-              <div className="pure-g">
-                <div className="pure-u-5-5 pure-u-md-1-3">
-                  <label htmlFor="foo">Amount in Kether: </label>
-                  <input className="pure-input-1-3" ref="amount" type="number" step="0.00001" placeholder="Please enter amount in Kether" />
-                </div>
-                <div className="pure-u-1 pure-u-md-1-3">
-                  <button className="pure-button pure-button-primary pure-input-1-5" disabled={disabledBtn} onClick={this.onClickBuy}>Buy Tokens</button>
-                </div>
-              </div>
+          <div className="pure-u-1-12">
+          </div>
+          <div className="pure-u-1-5 pure-u-md-1-4">
+            <form className="pure-form pure-form-aligned">
+                <div style={{marginBottom: '15px'}}>Choose amount to invest</div>
+                  <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
+                  <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
             </form>
+            <h2>Requirements</h2>
+            <div style={{margin: "10px 0px"}}>Recommended gas limit 200,000</div>
+            <div>Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
           </div>
 
         </main>

@@ -9,10 +9,10 @@ body {
   width: 100%;
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#eeeeee+0,cccccc+100 */
 background: #eeeeee; /* Old browsers */
-background: -moz-linear-gradient(-45deg, #eeeeee 0%, #cccccc 100%); /* FF3.6-15 */
-background: -webkit-linear-gradient(-45deg, #eeeeee 0%,#cccccc 100%); /* Chrome10-25,Safari5.1-6 */
-background: linear-gradient(135deg, #eeeeee 0%,#cccccc 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+background: -moz-linear-gradient(-45deg, #eeeeee 0%, #cccccc 100%) fixed; /* FF3.6-15 */
+background: -webkit-linear-gradient(-45deg, #eeeeee 0%,#cccccc 100%) fixed; /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(135deg, #eeeeee 0%,#cccccc 100%) fixed; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=1 ) fixed; /* IE6-9 fallback on horizontal gradient */
 
 }
 #root {
