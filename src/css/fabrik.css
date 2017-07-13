@@ -1,0 +1,5 @@
+@font-face {
+    font-family: "fabrik";
+    src: url("../fonts/fabrik-bold-webfont.woff") format('woff');
+    font-weight: bold;
+}
