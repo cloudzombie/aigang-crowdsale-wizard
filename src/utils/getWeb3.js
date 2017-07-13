@@ -17,26 +17,22 @@ let getWeb3 = new Promise(function (resolve, reject) {
       web3 = new Web3(web3.currentProvider)
 
       web3.version.getNetwork((err, netId) => {
-        if (netId !== "42") {
-          sweetAlert({
-            title: "Oopss...",
-            text: "Please change to Kovan testnet",
-            imageUrl: gif,
-            allowOutsideClick: true,
-            imageSize: '386x538'
-          });
-        }
+        let netIdName;
         switch (netId) {
           case "1":
+            netIdName = 'mainnet'
             console.log('This is mainnet')
             break
           case "2":
+            netIdName = 'morden'
             console.log('This is the deprecated Morden test network.')
             break
           case "3":
+            netIdName = 'ropsten'
             console.log('This is the ropsten test network.')
             break
           case "42":
+            netIdName = 'kovan'
             console.log('This is kovan')
             break
           default:
@@ -44,30 +40,30 @@ let getWeb3 = new Promise(function (resolve, reject) {
         }
         resolve({
           web3,
-          netId
+          netIdName,
+          injectedWeb3: true
         });
       })
       console.log('Injected web3 detected.');
 
     } else {
-      sweetAlert({
-        title: "Oopss...",
-        text: "Please Install <a href='https://metamask.io/' target='_blank'>Metamask.io</a> chrome extension",
-        html: true,
-        type: "error"
-      });
-      // // Fallback to localhost if no web3 injection.
-      // var provider = new Web3.providers.HttpProvider('http://localhost:8545')
+      // Fallback to localhost if no web3 injection.
+      const MAINET_RPC_URL = 'https://mainnet.infura.io/metamask'
+      const ROPSTEN_RPC_URL = 'https://ropsten.infura.io/metamask'
+      const KOVAN_RPC_URL = 'https://kovan.infura.io/metamask'
+      const RINKEBY_RPC_URL = 'https://rinkeby.infura.io/metamask'
 
-      // web3 = new Web3(provider)
+      var provider = new Web3.providers.HttpProvider(ROPSTEN_RPC_URL)
 
-      // results = {
-      //   web3: web3
-      // }
+      web3 = new Web3(provider)
+      results = {
+        web3: web3,
+        netIdName: 'ropsten',
+      }
 
-      // console.log('No web3 instance injected, using Local web3.');
+      console.log('No web3 instance injected, using Local web3.');
 
-      // resolve(results)
+      resolve(results)
     }
   })
 })

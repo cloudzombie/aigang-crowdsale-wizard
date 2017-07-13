@@ -1,29 +1,108 @@
 import React, { Component } from 'react'
 import RomanCrowdsale from '../build/contracts/RomanCrowdsale.json'
+import Presale from './contract_abi/Presale.json'
+import Token from './contract_abi/Token.json'
+
 import MintableToken from '../build/contracts/MintableToken.json'
 import getWeb3 from './utils/getWeb3'
 import Loading from './Loading'
 import './css/pure-min.css'
+import './css/fabrik.css'
 import './App.css'
+
+const Header = () => {
+  return (
+    <nav className="navbar pure-menu pure-menu-horizontal" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+      <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
+      <h1>Presale Investment</h1>
+      <div style={{ alignSelf: 'center' }}>
+        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-2x"></a>
+        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-2x"></a>
+        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-2x"></a>
+        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-2x"></a>
+      </div>
+    </nav>
+  )
+}
+
+class Table extends Component {
+  componentWillUpdate(nextProps, nextState) {
+    if (this.refs.copyBtn) {
+      const Clipboard = require('clipboard');
+      this.clipboard = new Clipboard(this.refs.copyBtn);
+    }
+  }
+
+  render() {
+    const domain = this.props.netIdName === "mainnet" ? '' : this.props.netIdName + '.'
+    const currentAccountLink = `https://${domain}etherscan.io/address/${this.props.currentAccount}`
+    const crowdsaleAddressLink = `https://${domain}etherscan.io/address/${this.props.crowdsaleAddress}`
+    const onCopyClick = () => {
+    }
+    let balanceRow, copyBtn
+    if (this.props.injectedWeb3) {
+      balanceRow = (<tr>
+        <td>Your investment balance</td>
+        <td>{this.props.balance} {this.props.tokenSymbol}</td>
+      </tr>)
+    }
+    return (
+      <div className="pure-u-16-24 pure-u-md-2-4">
+        <table className="pure-table pure-table-horizontal">
+          <tbody>
+            <tr>
+              <td><b>Pre-sale target</b></td>
+              <td>
+                {this.props.presaleTarget} ETH
+            </td>
+            </tr>
+
+            <tr>
+              <td>Your wallet address</td>
+              <td>
+                <a href={this.props.currentAccountLink} target="_blank">{this.props.currentAccount}</a>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Presale Contract Address</td>
+              <td><a href={this.props.crowdsaleAddressLink} target="_blank">{this.props.crowdsaleAddress}</a>
+                <i ref="copyBtn" onClick={onCopyClick} data-clipboard-text={this.props.crowdsaleAddress} className="fa fa-files-o fa-border" aria-hidden="true"></i>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Total Invested</td>
+              <td>
+                {this.props.totalInvested} ETH
+            </td>
+            </tr>
+
+            <tr>
+              <td>Price per AIT</td>
+              <td>{this.props.pricePerAit} ETH</td>
+            </tr>
+            <tr>
+              <td>Investor bonus in the crowdsale</td>
+              <td>{this.props.investorBonus}%</td>
+            </tr>
+            {balanceRow}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+}
 
 class App extends Component {
   constructor(props) {
     super(props)
     this.onClickBuy = this.onClickBuy.bind(this)
-    this.crowdsaleAddress = '0x6b070d930bB22990c83fBBfcba6faB129AD7E385'
+    this.presaleAddress = '0xBef0Cd92aA215348A33B9F8E5263793760dFe8c5'
     this.state = {
       web3: null,
-      netId: null,
-      defaultAccount: null,
-      tokenAddress: 0x0,
+      netIdName: null,
       disabledBtn: false,
-    }
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    if (this.refs.copyCrowdsaleAddr) {
-      const Clipboard = require('clipboard');
-      this.clipboard = new Clipboard(this.refs.copyCrowdsaleAddr);
     }
   }
 
@@ -33,70 +112,77 @@ class App extends Component {
 
     getWeb3
       .then(results => {
+        this.injectedWeb3 = results.injectedWeb3;
         this.setState({
           web3: results.web3,
+          netIdName: results.netIdName,
+          disabledBtn: !results.injectedWeb3
         })
 
         // Instantiate contract once web3 provided.
-        this.instantiateContract()
+        // this.instantiateContract()
+        this.instantiatePresaleContract()
       })
       .catch(() => {
         console.log('Error finding web3.')
       })
   }
 
-  instantiateContract() {
-    /*
-     * SMART CONTRACT EXAMPLE
-     *
-     * Normally these functions would be called in the context of a
-     * state management library, but for convenience I've placed them here.
-     */
-
+  instantiatePresaleContract() {
     const contract = require('truffle-contract')
-    const romanCrowdsale = contract(RomanCrowdsale)
-    const mintableToken = contract(MintableToken)
-    romanCrowdsale.setProvider(this.state.web3.currentProvider)
-    mintableToken.setProvider(this.state.web3.currentProvider)
-
-    // Declaring this for later so we can chain functions on romanCrowdsale.
-    var romanCrowdsaleInstance, tokenInstance
-
-    // Get accounts.
+    const presale = contract({
+      abi: Presale,
+    })
+    const token = contract({
+      abi: Token,
+    })
+    presale.setProvider(this.state.web3.currentProvider)
+    token.setProvider(this.state.web3.currentProvider)
+    let presaleInstance;
+    let presaleTarget, currentAccount, crowdsaleAddress, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol;
     this.state.web3.eth.getAccounts((error, accounts) => {
-      let token, totalSupply;
-      romanCrowdsale.at(this.crowdsaleAddress).then((instance) => {
-        this.romanCrowdsaleInstance = instance
-        romanCrowdsaleInstance = instance
-        console.log('cr', romanCrowdsaleInstance)
-        // Stores a given value, 5 by default.
-        return romanCrowdsaleInstance.token()
-      }).then((_token) => {
-        token = _token;
-        // Get the value from the contract to prove it worked.
-        tokenInstance = mintableToken.at(token);
-        this.tokenInstance = tokenInstance
-        console.log('tt', tokenInstance)
-        return tokenInstance.totalSupply.call()
-      }).then((totalSupply) => {
-        totalSupply = this.state.web3.fromWei(totalSupply.toNumber(), 'ether')
-        this.updateBalance(accounts[0]);
-        this.setState({
-          defaultAccount: accounts[0] || "Please Unlock Metamask",
-          tokenAddress: token,
-          crowdsaleAddress: romanCrowdsaleInstance.address,
-          totalSupply: totalSupply
-        })
-      }).catch((e) => {
-        console.error(e);
+      presale.at(this.presaleAddress).then((instance) => {
+        this.presaleInstance = instance;
+        console.log(this.presaleInstance);
+        return instance.totalSupplyCap.call()
+      }).then((_totalSupplyCap) => {
+        presaleTarget = this.state.web3.fromWei(_totalSupplyCap.toNumber(), 'ether')
+        return this.presaleInstance.ait()
       })
+        .then((_token) => {
+          this.tokenInstance = token.at(_token)
+          console.log(this.tokenInstance, "TOKEN INS")
+          return this.presaleInstance.totalSold.call()
+        })
+        .then((_totalSold) => {
+          totalInvested = this.state.web3.fromWei(_totalSold.toNumber(), 'ether')
+          return this.presaleInstance.exchangeRate.call()
+        })
+        .then((_exchange) => {
+          pricePerAit = _exchange.toNumber()
+          return this.presaleInstance.investor_bonus.call()
+        })
+        .then((_investorBonus) => {
+          investorBonus = _investorBonus.toNumber()
+          return this.tokenInstance.symbol.call()
+        })
+        .then((_symbol) => {
+          tokenSymbol = _symbol
+          this.updateBalance(accounts[0]);
+          this.setState({
+            currentAccount: accounts[0],
+            presaleTarget, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol,
+          })
+        })
     })
 
   }
+
   updateBalance(account) {
+    console.log('updateBalance')
     return this.tokenInstance.balanceOf.call(account).then((balance) => {
       balance = this.state.web3.fromWei(balance.toNumber(), 'ether')
-      this.setState({ tokenBalance: balance })
+      this.setState({ balance })
     })
   }
 
@@ -104,8 +190,8 @@ class App extends Component {
     this.state.web3.eth.getTransaction(txId, (error, res) => {
       if (res.blockHash) {
         console.log('mined!', res.blockNumber)
-        this.updateBalance(this.state.defaultAccount);
-        this.setState({ txStatus: `Mined at ${res.blockNumber}`, disabledBtn: false })
+        this.updateBalance(this.state.currentAccount);
+        this.setState({ disabledBtn: false })
       } else {
         console.log('Not mined yet')
         this.checkTransaction(txId)
@@ -118,29 +204,15 @@ class App extends Component {
     if (!isNaN(amount)) {
       this.setState({ disabledBtn: true })
       amount = this.state.web3.toWei(amount, 'ether');
-      this.romanCrowdsaleInstance.buyTokens(this.state.defaultAccount, { value: amount, from: this.state.defaultAccount }).then((result) => {
+      this.presaleInstance.sendTransaction({ value: amount, from: this.state.currentAccount }).then((result) => {
         console.log(result);
-        this.setState({ txId: result.tx, txStatus: 'pending' });
         setTimeout(this.checkTransaction.bind(this, result.tx), 5);
       })
     }
   }
-  onCopyClick() {
-    this.refs.tooltip.classList.toggle('show')
-    setTimeout(() => {
-      this.refs.tooltip.classList.toggle('show')
-    }, 2000);
-  }
+
   render() {
-    const loading = !this.state.web3;
-    if (loading) {
-      return (
-        <Loading />
-      )
-    }
-    const currentAccount = `https://kovan.etherscan.io/address/${this.state.defaultAccount}`
-    const tokenAddress = `https://kovan.etherscan.io/address/${this.state.tokenAddress}`
-    const crowdsaleAddress = `https://kovan.etherscan.io/address/${this.state.crowdsaleAddress}`
+
     const disabledBtn = this.state.disabledBtn;
     let txId, txStatus;
     if (this.state.txId) {
@@ -155,69 +227,29 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal" style={{ justifyContent: 'space-between' }}>
-          <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
-          <h1>Presale Investment</h1>
-          <div style={{ alignSelf: 'center' }}>
-            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-lg"></a>
-            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-lg"></a>
-            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-lg"></a>
-            <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-lg"></a>
-          </div>
-        </nav>
+        <Header />
         <main className="container pure-g">
-          <div className="pure-u-4-5 pure-u-md-3-4">
-            <h1 style={{ color: '#7c24ad' }}>
+          <div className="pure-u-16-24 pure-u-md-2-4">
+            <h1 style={{ color: '#7c24ad', fontSize: '50px' }}>
               Let's build it together!
             </h1>
             <p className="lightGrey">
-              Invest directly from your metamask account by selecting the amount and clicking invest, or copy
+              Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> account by selecting the amount and clicking invest, or copy
               the address and send Ethers from any other wallet.
               </p>
           </div>
-          <div className="pure-u-16-24 pure-u-md-2-4">
-            <table className="pure-table pure-table-horizontal">
-              <tbody>
-                <tr>
-                  <td>Current Account</td>
-                  <td>
-                    <a href={currentAccount} target="_blank">{this.state.defaultAccount}</a>
-                  </td>
-                  <td></td>
-                </tr>
-
-                <tr>
-                  <td>Token Address</td>
-                  <td><a href={tokenAddress} target="_blank">{this.state.tokenAddress}</a></td>
-                  <td>
-                    <div id="tooltip" ref="tooltip">copied</div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Crowdsale Contract Address</td>
-                  <td><a href={crowdsaleAddress} target="_blank">{this.state.crowdsaleAddress}</a>
-                  </td>
-                  <td>
-                    <i onClick={this.onCopyClick.bind(this)} ref="copyCrowdsaleAddr" data-clipboard-text={this.state.crowdsaleAddress} className="fa fa-clipboard fa-lg" aria-hidden="true"></i>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>Total Supply</td>
-                  <td>{this.state.totalSupply} RST</td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>Balance</td>
-                  <td> {this.state.tokenBalance} RST</td>
-                  <td></td>
-                </tr>
-                {txId}
-                {txStatus}
-              </tbody>
-            </table>
-          </div>
+          <Table
+            presaleTarget={this.state.presaleTarget}
+            currentAccount={this.state.currentAccount}
+            crowdsaleAddress={this.presaleAddress}
+            totalInvested={this.state.totalInvested}
+            pricePerAit={this.state.pricePerAit}
+            investorBonus={this.state.investorBonus}
+            balance={this.state.balance}
+            tokenSymbol={this.state.tokenSymbol}
+            netIdName={this.state.netIdName}
+            injectedWeb3={this.injectedWeb3}
+          />
           <div className="pure-u-1-12">
           </div>
           <div className="pure-u-1-5 pure-u-md-1-4">
@@ -226,8 +258,8 @@ class App extends Component {
               <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
               <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
             </form>
-            <h2>Requirements</h2>
-            <div style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
+            <h4>Requirements</h4>
+            <div className="lightGrey" style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
             <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
           </div>
 
