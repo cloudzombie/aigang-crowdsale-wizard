@@ -1,15 +1,10 @@
 import Web3 from 'web3'
-import sweetAlert from 'sweetalert';
-import 'sweetalert/dist/sweetalert.css';
-import gif from '../gif_metamask.gif';
-
 
 let getWeb3 = new Promise(function (resolve, reject) {
   // Wait for loading completion to avoid race conditions with web3 injection timing.
   window.addEventListener('load', function () {
-    var results
-    var web3 = window.web3;
-    var netId
+    let results
+    let web3 = window.web3;
 
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
@@ -48,10 +43,10 @@ let getWeb3 = new Promise(function (resolve, reject) {
 
     } else {
       // Fallback to localhost if no web3 injection.
-      const MAINET_RPC_URL = 'https://mainnet.infura.io/metamask'
+      // const MAINET_RPC_URL = 'https://mainnet.infura.io/metamask'
       const ROPSTEN_RPC_URL = 'https://ropsten.infura.io/metamask'
-      const KOVAN_RPC_URL = 'https://kovan.infura.io/metamask'
-      const RINKEBY_RPC_URL = 'https://rinkeby.infura.io/metamask'
+      // const KOVAN_RPC_URL = 'https://kovan.infura.io/metamask'
+      // const RINKEBY_RPC_URL = 'https://rinkeby.infura.io/metamask'
 
       var provider = new Web3.providers.HttpProvider(ROPSTEN_RPC_URL)
 

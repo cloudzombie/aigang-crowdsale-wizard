@@ -1,25 +1,24 @@
 import React, { Component } from 'react'
-import RomanCrowdsale from '../build/contracts/RomanCrowdsale.json'
 import Presale from './contract_abi/Presale.json'
 import Token from './contract_abi/Token.json'
-
-import MintableToken from '../build/contracts/MintableToken.json'
 import getWeb3 from './utils/getWeb3'
-import Loading from './Loading'
-import './css/pure-min.css'
 import './css/fabrik.css'
 import './App.css'
 
 const Header = () => {
   return (
-    <nav className="navbar pure-menu pure-menu-horizontal" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-      <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-heading pure-menu-link site-logo" ></a>
-      <h1>Presale Investment</h1>
-      <div style={{ alignSelf: 'center' }}>
-        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-github fa-2x"></a>
-        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-medium fa-2x"></a>
-        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-telegram fa-2x"></a>
-        <a href="https://github.com/rstormsf/ICO_Truffle_Example" className="pure-menu-link fa fa-slack fa-2x"></a>
+    <nav id="nav" className="navbar pure-g pure-menu pure-menu-horizontal">
+      <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3">
+        <a href="https://aigang.network/" className="pure-menu-heading pure-menu-link pure-img site-logo" ></a>
+      </div>
+      <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-middle">
+        <h1>Presale Investment</h1>
+      </div>
+      <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-right">
+        <a href="https://github.com/AigangNetwork" target="_blank" className="pure-menu-link fa fa-github fa-2x"></a>
+        <a href="https://medium.com/aigang-network" target="_blank" className="pure-menu-link fa fa-medium fa-2x"></a>
+        <a href="https://t.me/aigangnetwork" target="_blank" className="pure-menu-link fa fa-telegram fa-2x"></a>
+        <a href="http://slack.aigang.network/" target="_blank" className="pure-menu-link fa fa-slack fa-2x"></a>
       </div>
     </nav>
   )
@@ -47,7 +46,7 @@ class Table extends Component {
       </tr>)
     }
     return (
-      <div className="pure-u-16-24 pure-u-md-2-4">
+      <div className="pure-u-1 pure-u-lg-18-24 pure-u-md-2-4">
         <table className="pure-table pure-table-horizontal">
           <tbody>
             <tr>
@@ -208,14 +207,14 @@ class App extends Component {
         console.log(result);
         setTimeout(this.checkTransaction.bind(this, result.tx), 5);
       })
-      .catch((error)=> {
-        console.error(error.message)
-        const rejectedCLicked = error.message.includes('User denied transaction signature')
-        if(rejectedCLicked){
-          this.setState({disabledBtn: false})
-        }
-        
-      })
+        .catch((error) => {
+          console.error(error.message)
+          const rejectedCLicked = error.message.includes('User denied transaction signature')
+          if (rejectedCLicked) {
+            this.setState({ disabledBtn: false })
+          }
+
+        })
     }
   }
 
@@ -236,41 +235,46 @@ class App extends Component {
     return (
       <div className="App">
         <Header />
-        <main className="container pure-g">
-          <div className="pure-u-16-24 pure-u-md-2-4">
-            <h1 style={{ color: '#7c24ad', fontSize: '50px' }}>
-              Let's build it together!
-            </h1>
-            <p className="lightGrey">
-              Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> account by selecting the amount and clicking invest, or copy
-              the address and send Ethers from any other wallet.
-              </p>
+        <main className="container">
+          <div className="pure-g">
+            <div className="pure-u-1 pure-u-md-1-1">
+              <h1 className="purple font-50">
+                Let's build it together!
+              </h1>
+            </div>
+            <div className="pure-u-1 pure-u-md-1-1 pure-u-lg-18-24">
+              <p className="lightGrey">
+                Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> account by selecting the amount and clicking invest, or copy
+                the address and send Ethers from any other wallet.
+                </p>
+            </div>
           </div>
-          <Table
-            presaleTarget={this.state.presaleTarget}
-            currentAccount={this.state.currentAccount}
-            crowdsaleAddress={this.presaleAddress}
-            totalInvested={this.state.totalInvested}
-            pricePerAit={this.state.pricePerAit}
-            investorBonus={this.state.investorBonus}
-            balance={this.state.balance}
-            tokenSymbol={this.state.tokenSymbol}
-            netIdName={this.state.netIdName}
-            injectedWeb3={this.injectedWeb3}
-          />
-          <div className="pure-u-1-12">
+          <div className="pure-g">
+            <Table
+              presaleTarget={this.state.presaleTarget}
+              currentAccount={this.state.currentAccount}
+              crowdsaleAddress={this.presaleAddress}
+              totalInvested={this.state.totalInvested}
+              pricePerAit={this.state.pricePerAit}
+              investorBonus={this.state.investorBonus}
+              balance={this.state.balance}
+              tokenSymbol={this.state.tokenSymbol}
+              netIdName={this.state.netIdName}
+              injectedWeb3={this.injectedWeb3}
+            />
+            <div className="pure-u-1 pure-u-lg-1-24">
+            </div>
+            <div className="pure-u-1 pure-u-lg-5-24 pure-u-md-1 form-container">
+              <form className="pure-form pure-form-aligned">
+                <div style={{ marginBottom: '15px' }}>Choose amount to invest</div>
+                <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
+                <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
+              </form>
+              <h4>Requirements</h4>
+              <div className="lightGrey" style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
+              <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
+            </div>
           </div>
-          <div className="pure-u-1-5 pure-u-md-1-4">
-            <form className="pure-form pure-form-aligned">
-              <div style={{ marginBottom: '15px' }}>Choose amount to invest</div>
-              <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
-              <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
-            </form>
-            <h4>Requirements</h4>
-            <div className="lightGrey" style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
-            <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
-          </div>
-
         </main>
       </div>
     );
