@@ -60,13 +60,13 @@ class Table extends Component {
             <tr>
               <td>Your wallet address</td>
               <td>
-                <a href={this.props.currentAccountLink} target="_blank">{this.props.currentAccount}</a>
+                <a href={currentAccountLink} target="_blank">{this.props.currentAccount}</a>
               </td>
             </tr>
 
             <tr>
               <td>Presale Contract Address</td>
-              <td><a href={this.props.crowdsaleAddressLink} target="_blank">{this.props.crowdsaleAddress}</a>
+              <td><a href={crowdsaleAddressLink} target="_blank">{this.props.crowdsaleAddress}</a>
                 <i ref="copyBtn" onClick={onCopyClick} data-clipboard-text={this.props.crowdsaleAddress} className="fa fa-files-o fa-border" aria-hidden="true"></i>
               </td>
             </tr>
@@ -207,6 +207,14 @@ class App extends Component {
       this.presaleInstance.sendTransaction({ value: amount, from: this.state.currentAccount }).then((result) => {
         console.log(result);
         setTimeout(this.checkTransaction.bind(this, result.tx), 5);
+      })
+      .catch((error)=> {
+        console.error(error.message)
+        const rejectedCLicked = error.message.includes('User denied transaction signature')
+        if(rejectedCLicked){
+          this.setState({disabledBtn: false})
+        }
+        
       })
     }
   }
