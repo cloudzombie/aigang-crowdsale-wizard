@@ -14,7 +14,7 @@ const Header = () => {
         <a href="https://aigang.network/" className="pure-menu-heading pure-menu-link pure-img site-logo" ></a>
       </div>
       <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-middle">
-        <h1>Presale Investment</h1>
+        <h1>Presale Investment (ROPSTEN NETWORK)</h1>
       </div>
       <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-right">
         <a href="https://github.com/AigangNetwork" target="_blank" className="pure-menu-link fa fa-github fa-2x"></a>
@@ -112,7 +112,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.onClickBuy = this.onClickBuy.bind(this)
-    this.presaleAddress = '0xBef0Cd92aA215348A33B9F8E5263793760dFe8c5'
+    this.presaleAddress = '0xd3fd125a1f7Aeb35117fb8d7eF99052364C39956'
     this.state = {
       web3: null,
       netIdName: null,
@@ -282,7 +282,8 @@ class App extends Component {
             <div className="pure-u-1 pure-u-md-1-1 pure-u-lg-18-24">
               <p className="lightGrey">
                 Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> account by selecting the amount and clicking invest, or copy
-                the address and send Ethers from any other wallet.
+                the address and send Ethers from any other wallet you own.<br/>
+                Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.
                 </p>
             </div>
           </div>
@@ -310,10 +311,8 @@ class App extends Component {
                 <input id="amount" className="pure-input-2-3" ref="amount" type="number" step="0.00001" placeholder="0" />
                 <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
               </form>
-              <h4>Requirements</h4>
               {metamask_not_found}
               <div className="lightGrey" style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
-              <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
             </div>
           </div>
         </main>
