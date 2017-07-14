@@ -43,7 +43,7 @@ class Table extends Component {
 
   render() {
     const domain = this.props.netIdName === "mainnet" ? '' : this.props.netIdName + '.'
-    const currentAccountLink = this.props.lockedMetamask ? '' : `https://${domain}etherscan.io/address/${this.props.currentAccount}`
+    const currentAccountLink = this.props.lockedMetamask ? '#' : `https://${domain}etherscan.io/address/${this.props.currentAccount}`
     const crowdsaleAddressLink = `https://${domain}etherscan.io/address/${this.props.crowdsaleAddress}`
     const lockedMetamask = this.props.lockedMetamask ? 'purple' : ''
     let balanceRow
@@ -67,7 +67,7 @@ class Table extends Component {
             <tr>
               <td>Your wallet address</td>
               <td>
-                <a href={currentAccountLink} target="_blank">
+                <a href={currentAccountLink}>
                   <span className={lockedMetamask}>{this.props.currentAccount}</span>
                 </a>
               </td>
