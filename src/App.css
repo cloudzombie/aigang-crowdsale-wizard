@@ -39,7 +39,7 @@ body,
 .header-middle {
   text-align: center;
 }
-.pure-menu-link {
+tr, .pure-menu-link {
     -webkit-transition: 0.5s;
   -moz-transition: 0.5s;
   -o-transition: 0.5s;
@@ -193,4 +193,8 @@ code {
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.error {
+  background: rgba(249, 92, 92, 0.2);
 }

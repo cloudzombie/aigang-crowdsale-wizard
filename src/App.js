@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import 'react-tooltip-component/lib/tooltip.css';
+import Tooltip from 'react-tooltip-component';
 import Presale from './contract_abi/Presale.json'
 import Token from './contract_abi/Token.json'
 import getWeb3 from './utils/getWeb3'
@@ -25,20 +27,25 @@ const Header = () => {
 }
 
 class Table extends Component {
+  state = {
+    tooltipTitle: 'Copy'
+  }
+  boundOnCopyClick = this.onCopyClick.bind(this)
   componentWillUpdate(nextProps, nextState) {
     if (this.refs.copyBtn) {
       const Clipboard = require('clipboard');
       this.clipboard = new Clipboard(this.refs.copyBtn);
     }
   }
+  onCopyClick() {
+    this.setState({ tooltipTitle: 'Copied!' })
+  }
 
   render() {
     const domain = this.props.netIdName === "mainnet" ? '' : this.props.netIdName + '.'
     const currentAccountLink = `https://${domain}etherscan.io/address/${this.props.currentAccount}`
     const crowdsaleAddressLink = `https://${domain}etherscan.io/address/${this.props.crowdsaleAddress}`
-    const onCopyClick = () => {
-    }
-    let balanceRow, copyBtn
+    let balanceRow
     if (this.props.injectedWeb3) {
       balanceRow = (<tr>
         <td>Your investment balance</td>
@@ -66,7 +73,9 @@ class Table extends Component {
             <tr>
               <td>Presale Contract Address</td>
               <td><a href={crowdsaleAddressLink} target="_blank">{this.props.crowdsaleAddress}</a>
-                <i ref="copyBtn" onClick={onCopyClick} data-clipboard-text={this.props.crowdsaleAddress} className="fa fa-files-o fa-border" aria-hidden="true"></i>
+                <Tooltip title={this.state.tooltipTitle} position='top'>
+                  <i ref="copyBtn" onClick={this.boundOnCopyClick} data-clipboard-text={this.props.crowdsaleAddress} className="fa fa-files-o fa-border" aria-hidden="true"></i>
+                </Tooltip>
               </td>
             </tr>
 
@@ -76,7 +85,6 @@ class Table extends Component {
                 {this.props.totalInvested} ETH
             </td>
             </tr>
-
             <tr>
               <td>Price per AIT</td>
               <td>{this.props.pricePerAit} ETH</td>
@@ -84,6 +92,10 @@ class Table extends Component {
             <tr>
               <td>Investor bonus in the crowdsale</td>
               <td>{this.props.investorBonus}%</td>
+            </tr>
+            <tr className={this.props.error}>
+              <td>Minimum Investment</td>
+              <td>{this.props.minimumInvestment} ETH</td>
             </tr>
             {balanceRow}
           </tbody>
@@ -138,7 +150,8 @@ class App extends Component {
     presale.setProvider(this.state.web3.currentProvider)
     token.setProvider(this.state.web3.currentProvider)
     let presaleInstance;
-    let presaleTarget, currentAccount, crowdsaleAddress, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol;
+    let presaleTarget, currentAccount, crowdsaleAddress, totalInvested,
+      pricePerAit, investorBonus, balance, tokenSymbol, minimumInvestment;
     this.state.web3.eth.getAccounts((error, accounts) => {
       presale.at(this.presaleAddress).then((instance) => {
         this.presaleInstance = instance;
@@ -163,6 +176,10 @@ class App extends Component {
         })
         .then((_investorBonus) => {
           investorBonus = _investorBonus.toNumber()
+          return this.presaleInstance.minimum_investment.call()
+        })
+        .then((_minimumInvestment) => {
+          minimumInvestment = this.state.web3.fromWei(_minimumInvestment.toNumber(), 'ether')
           return this.tokenInstance.symbol.call()
         })
         .then((_symbol) => {
@@ -170,7 +187,7 @@ class App extends Component {
           this.updateBalance(accounts[0]);
           this.setState({
             currentAccount: accounts[0],
-            presaleTarget, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol,
+            presaleTarget, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol, minimumInvestment
           })
         })
     })
@@ -198,10 +215,17 @@ class App extends Component {
     })
   }
 
-  onClickBuy() {
+  onClickBuy(e) {
+    e.preventDefault()
     let amount = Number(this.refs.amount.value);
+
     if (!isNaN(amount)) {
-      this.setState({ disabledBtn: true })
+      if (amount < Number(this.state.minimumInvestment)) {
+        console.log('sdfsdfsd')
+        this.setState({ belowMinimum: 'error' })
+        return;
+      }
+      this.setState({ disabledBtn: true, belowMinimum: 'passed' })
       amount = this.state.web3.toWei(amount, 'ether');
       this.presaleInstance.sendTransaction({ value: amount, from: this.state.currentAccount }).then((result) => {
         console.log(result);
@@ -219,7 +243,6 @@ class App extends Component {
   }
 
   render() {
-
     const disabledBtn = this.state.disabledBtn;
     let txId, txStatus;
     if (this.state.txId) {
@@ -261,6 +284,8 @@ class App extends Component {
               tokenSymbol={this.state.tokenSymbol}
               netIdName={this.state.netIdName}
               injectedWeb3={this.injectedWeb3}
+              minimumInvestment={this.state.minimumInvestment}
+              error={this.state.belowMinimum}
             />
             <div className="pure-u-1 pure-u-lg-1-24">
             </div>
