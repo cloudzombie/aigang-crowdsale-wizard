@@ -6,7 +6,7 @@ import Token from './contract_abi/Token.json'
 import getWeb3 from './utils/getWeb3'
 import './css/fabrik.css'
 import './App.css'
-
+const ERROR_MSG = "Please Unlock Metamask"
 const Header = () => {
   return (
     <nav id="nav" className="navbar pure-g pure-menu pure-menu-horizontal">
@@ -43,13 +43,14 @@ class Table extends Component {
 
   render() {
     const domain = this.props.netIdName === "mainnet" ? '' : this.props.netIdName + '.'
-    const currentAccountLink = `https://${domain}etherscan.io/address/${this.props.currentAccount}`
+    const currentAccountLink = this.props.lockedMetamask ? '' : `https://${domain}etherscan.io/address/${this.props.currentAccount}`
     const crowdsaleAddressLink = `https://${domain}etherscan.io/address/${this.props.crowdsaleAddress}`
+    const lockedMetamask = this.props.lockedMetamask ? 'purple' : ''
     let balanceRow
     if (this.props.injectedWeb3) {
       balanceRow = (<tr>
         <td>Your investment balance</td>
-        <td>{this.props.balance} {this.props.tokenSymbol}</td>
+        <td className={lockedMetamask}>{this.props.balance} {this.props.lockedMetamask ? '' : this.props.tokenSymbol}</td>
       </tr>)
     }
     return (
@@ -66,7 +67,9 @@ class Table extends Component {
             <tr>
               <td>Your wallet address</td>
               <td>
-                <a href={currentAccountLink} target="_blank">{this.props.currentAccount}</a>
+                <a href={currentAccountLink} target="_blank">
+                  <span className={lockedMetamask}>{this.props.currentAccount}</span>
+                </a>
               </td>
             </tr>
 
@@ -139,6 +142,18 @@ class App extends Component {
       })
   }
 
+  checkForAccountChanges() {
+    const accountInterval = setInterval(() => {
+      this.state.web3.eth.getAccounts((error, accounts)=> {
+        const account = accounts[0]
+        if (this.state.currentAccount !== account) {
+          this.setState({currentAccount: account})
+          this.updateBalance(account)
+        }
+      })
+    }, 1000);
+  }
+
   instantiatePresaleContract() {
     const contract = require('truffle-contract')
     const presale = contract({
@@ -184,11 +199,12 @@ class App extends Component {
         })
         .then((_symbol) => {
           tokenSymbol = _symbol
-          this.updateBalance(accounts[0]);
           this.setState({
-            currentAccount: accounts[0],
+            currentAccount: accounts[0] || ERROR_MSG,
+            lockedMetamask: !accounts[0],
             presaleTarget, totalInvested, pricePerAit, investorBonus, balance, tokenSymbol, minimumInvestment
           })
+          this.updateBalance(accounts[0])
         })
     })
 
@@ -199,6 +215,12 @@ class App extends Component {
     return this.tokenInstance.balanceOf.call(account).then((balance) => {
       balance = this.state.web3.fromWei(balance.toNumber(), 'ether')
       this.setState({ balance })
+    })
+    .then(()=> {
+      this.checkForAccountChanges()
+    })
+    .catch(() => {
+      this.setState({ balance: ERROR_MSG })
     })
   }
 
@@ -221,7 +243,6 @@ class App extends Component {
 
     if (!isNaN(amount)) {
       if (amount < Number(this.state.minimumInvestment)) {
-        console.log('sdfsdfsd')
         this.setState({ belowMinimum: 'error' })
         return;
       }
@@ -244,17 +265,10 @@ class App extends Component {
 
   render() {
     const disabledBtn = this.state.disabledBtn;
-    let txId, txStatus;
-    if (this.state.txId) {
-      txId = (<tr>
-        <td>TransactionID</td>
-        <td>{this.state.txId}</td>
-      </tr>)
-      txStatus = (<tr>
-        <td>Transaction Status </td>
-        <td>{this.state.txStatus}</td>
-      </tr>)
-    }
+
+    const metamask_not_found = !this.injectedWeb3 ? (
+      <div className="purple">Metamask was not found, please install the extension or check your settings</div>
+    ) : ''
     return (
       <div className="App">
         <Header />
@@ -286,6 +300,7 @@ class App extends Component {
               injectedWeb3={this.injectedWeb3}
               minimumInvestment={this.state.minimumInvestment}
               error={this.state.belowMinimum}
+              lockedMetamask={this.state.lockedMetamask}
             />
             <div className="pure-u-1 pure-u-lg-1-24">
             </div>
@@ -296,6 +311,7 @@ class App extends Component {
                 <button id="buy" className="pure-button pure-button-primary pure-input-1-3" disabled={disabledBtn} onClick={this.onClickBuy}>INVEST</button>
               </form>
               <h4>Requirements</h4>
+              {metamask_not_found}
               <div className="lightGrey" style={{ margin: "10px 0px" }}>Recommended gas limit 200,000</div>
               <div className="lightGrey">Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.</div>
             </div>
