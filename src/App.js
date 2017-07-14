@@ -14,7 +14,7 @@ const Header = () => {
         <a href="https://aigang.network/" className="pure-menu-heading pure-menu-link pure-img site-logo" ></a>
       </div>
       <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-middle">
-        <h1>Presale Investment (ROPSTEN NETWORK)</h1>
+        <h1>Seed Investment (ROPSTEN NETWORK)</h1>
       </div>
       <div className="pure-u-1 pure-u-md-1-3 pure-u-lg-1-3 header-right">
         <a href="https://github.com/AigangNetwork" target="_blank" className="pure-menu-link fa fa-github fa-2x"></a>
@@ -281,7 +281,7 @@ class App extends Component {
             </div>
             <div className="pure-u-1 pure-u-md-1-1 pure-u-lg-18-24">
               <p className="lightGrey">
-                Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> account by selecting the amount and clicking invest, or copy
+                Invest directly from your <a className="purple bold-link" href="https://metamask.io" target="_blank">metamask</a> wallet by selecting the amount and clicking invest, or copy
                 the address and send Ethers from any other wallet you own.<br/>
                 Do not send Ethers(ETH) from exchanges. This includes Kraken, Poloniex, Coinbase, and others.
                 </p>
