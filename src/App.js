@@ -112,7 +112,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.onClickBuy = this.onClickBuy.bind(this)
-    this.presaleAddress = '0xd3fd125a1f7Aeb35117fb8d7eF99052364C39956'
+    this.presaleAddress = '0xEAfFD26a8E924f885636Ea06202BB43ACDE861a1'
     this.state = {
       web3: null,
       netIdName: null,
