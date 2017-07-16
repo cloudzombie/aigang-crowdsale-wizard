@@ -6,7 +6,7 @@ import Token from './contract_abi/Token.json'
 import getWeb3 from './utils/getWeb3'
 import './css/fabrik.css'
 import './App.css'
-const ERROR_MSG = "Please Unlock Metamask"
+const ERROR_MSG = "Please Unlock Metamask and refresh the webpage"
 const Header = () => {
   return (
     <nav id="nav" className="navbar pure-g pure-menu pure-menu-horizontal">
@@ -250,6 +250,28 @@ class App extends Component {
       amount = this.state.web3.toWei(amount, 'ether');
       this.presaleInstance.sendTransaction({ value: amount, from: this.state.currentAccount }).then((result) => {
         console.log(result);
+        //Show popup
+        // $("#modalTitle").html("Investment Successful");
+        // $("#modalText").html("Transaction has been sent. It should be mined soon and should apear in the wallet any moment (it might take up to a few minutes). Transaction Id: " + result.tx + "<br />");
+        // $("#generalModal").modal('show');
+        // <div id="generalModal" class="modal fade" role="dialog">
+          //   <div class="modal-dialog modal-sm">
+          //     <div class="modal-content">
+          //       <div class="modal-header">
+          //         <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+          //       </div>
+          //       <div class="modal-body">
+
+          //         <h3 id="modalTitle" class="text-primary-2 text-center"></h3>
+          //         <p id="modalText" style="word-wrap: break-word;" class="text-center"></p>
+
+          //       </div>
+          //     </div>
+
+          //   </div>
+          // </div>
+
         setTimeout(this.checkTransaction.bind(this, result.tx), 5);
       })
         .catch((error) => {
